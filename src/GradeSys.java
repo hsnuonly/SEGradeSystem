@@ -1,21 +1,11 @@
 
-import java.awt.List;
-import java.awt.RenderingHints.Key;
+
 import java.io.*;
-import java.lang.reflect.Array;
-import java.security.KeyStore.Entry;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Map;
 import java.util.Scanner;
-
-import org.omg.CORBA.PRIVATE_MEMBER;
-import org.w3c.dom.traversal.NodeIterator;
 
 public class GradeSys {
 
@@ -39,7 +29,7 @@ public class GradeSys {
 	public int getNumberOfMember() {
 		return studentTable.size();
 	}
-	public int[] getWeight(Long ID) {
+	public int[] getWeight() {
 		//studentTable.get(ID).getWeight();
 		return this.weight;
 	}
@@ -66,34 +56,35 @@ public class GradeSys {
 		}
 		return -1;
 	}
-	public void showGrades(int[] grade,String[] test,Long ID,GradeSys gradeSys) {
+	public void showGrades(int[] grade,String[] scoreName,Long ID,GradeSys gradeSys) {
 		for(int i=0;i<grade.length;i++) {
 			if(i<grade.length-2) {	
 				if(grade[i]>=60)
-					System.out.println(test[i]+":\t\t"+grade[i]);
+					System.out.println(scoreName[i]+":\t\t"+grade[i]);
 				else
-					System.out.println(test[i]+":\t\t"+grade[i]+"*");
+					System.out.println(scoreName[i]+":\t\t"+grade[i]+"*");
 			}
 			else {
 				if(grade[i]>=60)
-					System.out.println(test[i]+":\t"+grade[i]);
+					System.out.println(scoreName[i]+":\t"+grade[i]);
 				else
-					System.out.println(test[i]+":\t"+grade[i]+"*");
+					System.out.println(scoreName[i]+":\t"+grade[i]+"*");
 			}
 		}
 		System.out.println("total grade:\t"+gradeSys.getTotal(ID));
 	}
-	public int caseUpdateWeight(Scanner scanner,int weight[],GradeSys gradeSys,String test[],Long ID) {
+	public int caseUpdateWeight(Scanner scanner,GradeSys gradeSys,String scoreName[]) {
+		int weight[] = gradeSys.getWeight();
 		System.out.println("舊配分");
 		for(int i=0;i<weight.length;i++) {
 			if(i!=weight.length-1)
-				System.out.println(test[i]+"\t\t"+weight[i]);
+				System.out.println(scoreName[i]+"\t\t"+weight[i]);
 			else
-				System.out.println(test[i]+"\t"+weight[i]);
+				System.out.println(scoreName[i]+"\t"+weight[i]);
 		}
 		System.out.println("輸入新配分");
 		for(int i=0;i<weight.length;i++) {
-				System.out.print(test[i]+"\t\t");
+				System.out.print(scoreName[i]+"\t\t");
 				int inputWeight = scanner.nextInt();
 				gradeSys.updateWeight(inputWeight,i);
 				//System.out.print("\n");
@@ -101,25 +92,25 @@ public class GradeSys {
 		System.out.println("請確認新配分");
 		for(int i=0;i<weight.length;i++) {
 			if(i!=weight.length-1)
-				System.out.println(test[i]+"\t\t"+weight[i]+"%");
+				System.out.println(scoreName[i]+"\t\t"+weight[i]+"%");
 			else
-				System.out.println(test[i]+"\t"+weight[i]+"%");
+				System.out.println(scoreName[i]+"\t"+weight[i]+"%");
 		}
 		System.out.println("以上正確嗎? Y (Yes) 或 N (No)");
 		String inputYN = scanner.next();
 		if(inputYN.equals("N")) {
-			gradeSys.caseUpdateWeight(scanner,weight,gradeSys,test,ID);
+			gradeSys.caseUpdateWeight(scanner,gradeSys,scoreName);
 		}
 	
 		return 0;
 		
 		
 	}
-	public int commandExecute(Long ID,Scanner scanner,GradeSys gradeSys,String input ,int[] grade, int weight[],String[] test,int flag) {
+	public int commandExecute(Long ID,Scanner scanner,GradeSys gradeSys,String input ,int[] grade, int weight[],String[] scoreName,int flag) {
 		
 		switch (input) {
 		case "G":
-			gradeSys.showGrades(grade,test,ID,gradeSys);
+			gradeSys.showGrades(grade,scoreName,ID,gradeSys);
 			break;
 		case "R":
 			System.out.println(gradeSys.getName(ID)+"排名第"+(gradeSys.getRank(ID))+"/"+gradeSys.studentTable.size());
@@ -128,12 +119,13 @@ public class GradeSys {
 			System.out.println(gradeSys.getName(ID)+"的平均為"+(grade[0]+grade[1]+grade[2]+grade[3]+grade[4])/5);
 			break;
 		case "W":
-			flag=gradeSys.caseUpdateWeight(scanner,weight,gradeSys,test,ID);
+			flag=gradeSys.caseUpdateWeight(scanner,gradeSys,scoreName);
 			break;
 		case "E"	:
 			flag=1;
 			break;				
 		default:
+			System.out.println("無此指令！");
 			break;
 		}
 		return flag==1?1:0;
@@ -145,9 +137,9 @@ public class GradeSys {
 			System.out.println("輸入指令 1)G 顯示成績\n        2)R 顯示排名\n        3)A 顯示平均\n        4)W 更新配分\n        5)E 離開選單");
 			String input = scanner.next();
 			int grade[] = gradeSys.getGrade(ID);
-			int weight[] = gradeSys.getWeight(ID);
-			String test[]= {"lab1","lab2","lab3","mid-term","final exam"};
-			flag=gradeSys.commandExecute(ID,scanner,gradeSys,input,grade,weight,test,flag);
+			int weight[] = gradeSys.getWeight();
+			String scoreName[]= {"lab1","lab2","lab3","mid-term","final exam"};
+			flag=gradeSys.commandExecute(ID,scanner,gradeSys,input,grade,weight,scoreName,flag);
 
 		}
 	}
@@ -168,7 +160,7 @@ public class GradeSys {
 			System.out.print("輸入ID或Q(結束使用): ");
 			String input = scanner.next();
 			if(input.matches("^Q"))break;
-			else{
+			else if(input.matches("[0-9]+")){
 				ID = Long.parseLong(input);
 				System.out.println(ID);
 				if(gradeSys.inList(ID)) {
@@ -176,9 +168,11 @@ public class GradeSys {
 					menu(ID, scanner, gradeSys);
 					continue;
 				}
+				else System.out.println("查無此ID!");
 			}
-			
+			else System.out.println("輸入格式錯誤！");
 		}
+		scanner.close();
 	}
 
 }
