@@ -2,64 +2,69 @@
 import java.awt.List;
 import java.awt.RenderingHints.Key;
 import java.io.*;
+import java.lang.reflect.Array;
+import java.security.KeyStore.Entry;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Hashtable;
+import java.util.Map;
 import java.util.Scanner;
 
+import org.omg.CORBA.PRIVATE_MEMBER;
 import org.w3c.dom.traversal.NodeIterator;
 
 public class GradeSys {
 
-	ArrayList<StudentsGrade> studentList = new ArrayList<StudentsGrade>();
+	Hashtable<Long, StudentsGrade> studentTable = new Hashtable<>();
+	int weight[] = {10,10,10,30,40};
 	public Boolean add(StudentsGrade studentsGrade) {
-		this.studentList.add(studentsGrade);
-		update();
+		this.studentTable.put(studentsGrade.getID(), studentsGrade);
 		return true;
 	}
 	public int[] getGrade(Long ID) {
-		int index = getIndexByID(ID);
-		if(index>=0) {
-			return studentList.get(index).getGrade();
-		}
+		if(this.studentTable.containsKey(ID))return this.studentTable.get(ID).getGrade();
 		return null;
 	}
-	private void update() {
-		Collections.sort(studentList);
-	}
-	private int getIndexByID(Long ID) {
-		//System.out.print("In:");
-		for(int i=0;i<studentList.size();i++) {
-			//System.out.println(studentList.get(i).getID()-ID);
-			if(studentList.get(i).getID()-ID==0)return i;
-		}
-		return -1;
-	}
 	public boolean inList(Long ID) {
-		boolean temp = getIndexByID(ID)>=0;
-		return temp;
+		return this.studentTable.containsKey(ID);
 	}
 	public String getName(Long ID) {
-		int index = getIndexByID(ID);
-		return studentList.get(index).getName();
+		if(inList(ID))return studentTable.get(ID).getName();
+		else return "";
 	}
 	public int getNumberOfMember() {
-		return studentList.size();
+		return studentTable.size();
 	}
 	public int[] getWeight(Long ID) {
-		int index = getIndexByID(ID);
-		return studentList.get(index).getWeight();
+		//studentTable.get(ID).getWeight();
+		return this.weight;
 	}
-	public void updateWeight(Long ID,int newWeight,int position) {
-		int index = getIndexByID(ID);
-		studentList.get(index).updateWeight(newWeight,position);
+	public void updateWeight(int newWeight,int position) {
+		this.weight[position] = newWeight;
 	}
 	public int getTotal(Long ID) {
-		int index = getIndexByID(ID);
-		return studentList.get(index).getTotal();
+		if(inList(ID))return studentTable.get(ID).getTotal(weight);
+		return -1;
+	}
+	public int getRank(Long ID) {
+		ArrayList<StudentsGrade> temp = new ArrayList<>();
+		for(Map.Entry<Long, StudentsGrade> e:studentTable.entrySet()) {
+			temp.add(e.getValue());
+		}
+		temp.sort(new Comparator<StudentsGrade>() {
+			@Override
+			public int compare(StudentsGrade a,StudentsGrade b) {
+				return b.getTotal(weight)-a.getTotal(weight);
+			}
+		});
+		for(int i=0;i<temp.size();i++) {
+			if(temp.get(i).getID().equals(ID))return i+1;
+		}
+		return -1;
 	}
 	public void showGrades(int[] grade,String[] test,Long ID,GradeSys gradeSys) {
 		for(int i=0;i<grade.length;i++) {
@@ -90,7 +95,7 @@ public class GradeSys {
 		for(int i=0;i<weight.length;i++) {
 				System.out.print(test[i]+"\t\t");
 				int inputWeight = scanner.nextInt();
-				gradeSys.updateWeight(ID,inputWeight,i);
+				gradeSys.updateWeight(inputWeight,i);
 				//System.out.print("\n");
 		}
 		System.out.println("請確認新配分");
@@ -117,22 +122,21 @@ public class GradeSys {
 			gradeSys.showGrades(grade,test,ID,gradeSys);
 			break;
 		case "R":
-			System.out.println(gradeSys.getName(ID)+"排名第"+(gradeSys.getIndexByID(ID)+1)+"/"+gradeSys.studentList.size());
+			System.out.println(gradeSys.getName(ID)+"排名第"+(gradeSys.getRank(ID))+"/"+gradeSys.studentTable.size());
 			break;
 		case "A":
 			System.out.println(gradeSys.getName(ID)+"的平均為"+(grade[0]+grade[1]+grade[2]+grade[3]+grade[4])/5);
+			break;
 		case "W":
-			gradeSys.caseUpdateWeight(scanner,weight,gradeSys,test,ID);
+			flag=gradeSys.caseUpdateWeight(scanner,weight,gradeSys,test,ID);
+			break;
 		case "E"	:
 			flag=1;
 			break;				
 		default:
 			break;
 		}
-		if(flag==1)
-			return 1;
-		else
-			return 0;
+		return flag==1?1:0;
 	}
 
 	public static void menu(Long ID,Scanner scanner,GradeSys gradeSys) {
@@ -144,36 +148,12 @@ public class GradeSys {
 			int weight[] = gradeSys.getWeight(ID);
 			String test[]= {"lab1","lab2","lab3","mid-term","final exam"};
 			flag=gradeSys.commandExecute(ID,scanner,gradeSys,input,grade,weight,test,flag);
-//			String test[]= {"lab1","lab2","lab3","mid-term","final exam"};
-//			int flag=0;
-//			switch (input) {
-//			case "G":
-//				gradeSys.showGrades(grade,test);
-//				break;
-//			case "R":
-//				System.out.println(gradeSys.getName(ID)+"排名第"+(gradeSys.getIndexByID(ID)+1));
-//				break;
-//			case "A":
-//				System.out.println(gradeSys.getName(ID)+"的平均為"+(grade[0]+grade[1]+grade[2]+grade[3]+grade[4])/5);
-//			case "W":
-//				gradeSys.caseUpdateWeight(scanner,weight,gradeSys,test,ID);
-//			case "E"	:
-//				flag=1;
-//				break;				
-//			default:
-//				break;
-//			}
-//			if(flag==1)
-//				break;
+
 		}
 	}
 	public static void main(String[] args) throws IOException {
 		Long ID = null;
 		GradeSys gradeSys = new GradeSys();
-		//System.out.print("In:");
-		//Scanner scanner = new Scanner(System.in);
-		//int n = scanner.nextInt();
-		//scanner.nextLine();
 		Scanner scanner = new Scanner(new File("src/simple.txt"));
 		while(scanner.hasNext()) {
 			String studentData= scanner.nextLine();
