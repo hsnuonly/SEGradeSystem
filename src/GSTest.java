@@ -418,4 +418,118 @@ class GSTest {
 		GradeSys.login(scanner, gradeSys);
 		assertEquals(expect, stream.toString());
 	}
+	/** ----------------------------------------------------------------------------------------------------------------------
+	Unit test
+	integrationTest()
+	
+	case: (0) wrong input
+		  (1) add new student "104062104 吳宗欣 100 100 100 100 100"
+		  (2) enter UI, login 104062104
+		  (3) check grade, rank, average
+		  (4) update weight
+		  (5) check grade, rank, average
+		  (6) exit
+	------------------------------------------------------------------------------------------------------------------------- */
+
+    	@Test
+	void integrationTest() throws Exception{
+		ByteArrayOutputStream stream = new ByteArrayOutputStream();
+		System.setOut(new PrintStream(stream));
+		
+		String newInput = "104062104 吳宗欣 100 100 100 100 100";
+		StudentsGrade newStudent = new StudentsGrade(newInput.split(" "));
+		gradeSys.add(newStudent);
+		
+		Scanner scanner = new Scanner("104062104\n"
+				+ "G\nR\nA\nW\n"
+				+ "30\n20\n10\n20\n20\nY\n"
+				+ "G\nR\nA\n"
+				+ "E\n"
+				+ "Q\n");
+		String expect = "輸入ID或Q(結束使用): Welcome 吳宗欣\n" + 
+				"輸入指令 :\n" + 
+				"1)G 顯示成績\n" + 
+				"2)R 顯示排名\n" + 
+				"3)A 顯示平均\n" + 
+				"4)W 更新配分\n" + 
+				"5)E 離開選單\n" + 
+				">> lab1:          100\n" + 
+				"lab2:          100\n" + 
+				"lab3:          100\n" + 
+				"mid-term:      100\n" + 
+				"final exam:    100\n" + 
+				"Total grade:   100.0\n" + 
+				"輸入指令 :\n" + 
+				"1)G 顯示成績\n" + 
+				"2)R 顯示排名\n" + 
+				"3)A 顯示平均\n" + 
+				"4)W 更新配分\n" + 
+				"5)E 離開選單\n" + 
+				">> 吳宗欣排名第1/64\n" + 
+				"輸入指令 :\n" + 
+				"1)G 顯示成績\n" + 
+				"2)R 顯示排名\n" + 
+				"3)A 顯示平均\n" + 
+				"4)W 更新配分\n" + 
+				"5)E 離開選單\n" + 
+				">> 成績平均為: 89.626564\n" + 
+				"輸入指令 :\n" + 
+				"1)G 顯示成績\n" + 
+				"2)R 顯示排名\n" + 
+				"3)A 顯示平均\n" + 
+				"4)W 更新配分\n" + 
+				"5)E 離開選單\n" + 
+				">> 舊配分\n" + 
+				"lab1:           10%\n" + 
+				"lab2:           10%\n" + 
+				"lab3:           10%\n" + 
+				"mid-term:       30%\n" + 
+				"final exam:     40%\n" + 
+				"輸入新配分\n" + 
+				"lab1:          lab2:          lab3:          mid-term:      final exam:    請確認新配分\n" + 
+				"lab1:           30%\n" + 
+				"lab2:           20%\n" + 
+				"lab3:           10%\n" + 
+				"mid-term:       20%\n" + 
+				"final exam:     20%\n" + 
+				"以上正確嗎? Y (Yes) 或 N (No)\n" + 
+				"輸入指令 :\n" + 
+				"1)G 顯示成績\n" + 
+				"2)R 顯示排名\n" + 
+				"3)A 顯示平均\n" + 
+				"4)W 更新配分\n" + 
+				"5)E 離開選單\n" + 
+				">> lab1:          100\n" + 
+				"lab2:          100\n" + 
+				"lab3:          100\n" + 
+				"mid-term:      100\n" + 
+				"final exam:    100\n" + 
+				"Total grade:   100.0\n" + 
+				"輸入指令 :\n" + 
+				"1)G 顯示成績\n" + 
+				"2)R 顯示排名\n" + 
+				"3)A 顯示平均\n" + 
+				"4)W 更新配分\n" + 
+				"5)E 離開選單\n" + 
+				">> 吳宗欣排名第1/64\n" + 
+				"輸入指令 :\n" + 
+				"1)G 顯示成績\n" + 
+				"2)R 顯示排名\n" + 
+				"3)A 顯示平均\n" + 
+				"4)W 更新配分\n" + 
+				"5)E 離開選單\n" + 
+				">> 成績平均為: 89.56405\n" + 
+				"輸入指令 :\n" + 
+				"1)G 顯示成績\n" + 
+				"2)R 顯示排名\n" + 
+				"3)A 顯示平均\n" + 
+				"4)W 更新配分\n" + 
+				"5)E 離開選單\n" + 
+				">> 輸入ID或Q(結束使用): 結束程式\n" + 
+				"";
+		GradeSys.login(scanner, gradeSys);
+		assertEquals(expect, stream.toString());
+	}
+	
+
 }
