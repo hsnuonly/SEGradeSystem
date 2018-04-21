@@ -283,7 +283,7 @@ public class GradeSys {
 	public int[] getDistribution() {
 		int[] distribution = new int[10];
 		for(StudentsGrade sGrade:studentTable.values()) {
-			int level = ((int)sGrade.getTotal(this.weight)%10);
+			int level = ((int)sGrade.getTotal(this.weight)/10);
 			distribution[level>9?9:level]++;
 		}
 		return distribution;
@@ -305,7 +305,7 @@ public class GradeSys {
 			for(int j=0;j<distribution[i];j++) {
 				System.out.print("■");
 			}
-			System.out.print("\n");
+			System.out.printf("(%d) \n",distribution[i]);
 		}
 	}
 
@@ -318,8 +318,8 @@ public class GradeSys {
 	*3.將各科總分除以總人數，得到各科平均，並回傳
 	* Time estimate : O(n)
 	----------------------------------------------------------------------------------------------------------*/
-	public float[] getSubjectAverage() {
-		float subjectAverage[] = new float[5];
+	public double[] getSubjectAverage() {
+		double subjectAverage[] = new double[5];
 		for(StudentsGrade sGrade:studentTable.values()) {
 			int[] studentGrade = sGrade.getGrade();
 			for(int i=0;i<studentGrade.length;i++) {
@@ -342,7 +342,7 @@ public class GradeSys {
 	* Time estimate :O(1)
 	----------------------------------------------------------------------------------------------------------*/
 	public static void caseSubjectAverage(GradeSys gradeSys) {
-		float subjectAverage[] = gradeSys.getSubjectAverage();
+		double subjectAverage[] = gradeSys.getSubjectAverage();
 		for(int i=0;i<subjectAverage.length;i++) {
 			System.out.printf("%-11s: %.1f\n",gradeSys.scoreName[i],subjectAverage[i]);
 		}

@@ -2,6 +2,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.PrintStream;
+import java.util.ArrayList;
 import java.util.Scanner;
 
 import org.junit.jupiter.api.AfterAll;
@@ -307,6 +308,179 @@ class GSTest {
 	}
 	/** ----------------------------------------------------------------------------------------------------------------------
 	Unit test
+	testGetMakeUpList()
+	
+	case 1: 80
+	case 2: 81
+	------------------------------------------------------------------------------------------------------------------------- */
+	@Test
+	void testGetMakeUpList() throws Exception{
+		assertEquals(0, gradeSys.getMakeUpList(80).size());
+	}
+	@Test
+	void testGetMakeUpList2() throws Exception{
+		ArrayList<StudentsGrade> makeUpList = gradeSys.getMakeUpList(81);
+		assertEquals(1, makeUpList.size());
+		assertEquals(Integer.toString(962001051), makeUpList.get(0).getID().toString());
+	}
+
+	/** ----------------------------------------------------------------------------------------------------------------------
+	Unit test
+	testCaseMakeUpList()
+	
+	case 1: 80
+	case 2: 81
+	------------------------------------------------------------------------------------------------------------------------- */
+	@Test
+	void testCaseMakeUpList() throws Exception{
+		ByteArrayOutputStream stream = new ByteArrayOutputStream();
+		System.setOut(new PrintStream(stream));
+		Scanner scanner = new Scanner("80\n");
+		GradeSys.caseMakeUpList(scanner, gradeSys);
+		String expect = "請輸入及格分數: 全班及格！\n";
+		assertEquals(expect, stream.toString());
+	}
+	@Test
+	void testCaseMakeUpList2() throws Exception{
+		ByteArrayOutputStream stream = new ByteArrayOutputStream();
+		System.setOut(new PrintStream(stream));
+		Scanner scanner = new Scanner("81\n");
+		GradeSys.caseMakeUpList(scanner, gradeSys);
+		String expect = "請輸入及格分數: 962001051 李威廷\n";
+		assertEquals(expect, stream.toString());
+	}
+
+	/** ----------------------------------------------------------------------------------------------------------------------
+	Unit test
+	testGetDistribution()
+	
+	case 1: "src/gradeinput.txt"
+	case 2: add a student with average 70
+	------------------------------------------------------------------------------------------------------------------------- */
+	@Test
+	void testGetDistribution() throws Exception{
+		int expect[] = {0,0,0,0,0,0,0,0,36,27};
+		assertArrayEquals(expect, gradeSys.getDistribution());
+	}
+	@Test
+	void testGetDistribution2() throws Exception{
+		int expect[] = {0,0,0,0,0,0,0,1,36,27};
+		String newInput = "104062104 吳宗欣 70 70 70 70 70";
+		StudentsGrade newCase = new StudentsGrade(newInput.split(" "));
+		gradeSys.add(newCase);
+		assertArrayEquals(expect, gradeSys.getDistribution());
+	}
+	
+	/** ----------------------------------------------------------------------------------------------------------------------
+	Unit test
+	testCaseDistributionLineChart()
+	
+	case 1: 80
+	case 2: 81
+	------------------------------------------------------------------------------------------------------------------------- */
+	@Test
+	void testCaseDistributionLineChart() throws Exception{
+		ByteArrayOutputStream stream = new ByteArrayOutputStream();
+		System.setOut(new PrintStream(stream));
+		GradeSys.caseDistributionLineChart(gradeSys);
+		String expect = "  0 - 10 (0) \n" + 
+				" 10 - 20 (0) \n" + 
+				" 20 - 30 (0) \n" + 
+				" 30 - 40 (0) \n" + 
+				" 40 - 50 (0) \n" + 
+				" 50 - 60 (0) \n" + 
+				" 60 - 70 (0) \n" + 
+				" 70 - 80 (0) \n" + 
+				" 80 - 90 ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■(36) \n" + 
+				" 90 -100 ■■■■■■■■■■■■■■■■■■■■■■■■■■■(27) \n" + 
+				"";
+		assertEquals(expect, stream.toString());
+	}
+	@Test
+	void testCaseDistributionLineChart2() throws Exception{
+		String newInput = "104062104 吳宗欣 70 70 70 70 70";
+		StudentsGrade newCase = new StudentsGrade(newInput.split(" "));
+		gradeSys.add(newCase);
+		ByteArrayOutputStream stream = new ByteArrayOutputStream();
+		System.setOut(new PrintStream(stream));
+		GradeSys.caseDistributionLineChart(gradeSys);
+		String expect = "  0 - 10 (0) \n" + 
+				" 10 - 20 (0) \n" + 
+				" 20 - 30 (0) \n" + 
+				" 30 - 40 (0) \n" + 
+				" 40 - 50 (0) \n" + 
+				" 50 - 60 (0) \n" + 
+				" 60 - 70 (0) \n" + 
+				" 70 - 80 ■(1) \n" + 
+				" 80 - 90 ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■(36) \n" + 
+				" 90 -100 ■■■■■■■■■■■■■■■■■■■■■■■■■■■(27) \n" + 
+				"";
+		assertEquals(expect, stream.toString());
+	}
+	
+	/** ----------------------------------------------------------------------------------------------------------------------
+	Unit test
+	testGetSubjectAverage()
+	
+	case 1: "src/gradeinput.txt"
+	case 2: add a student with average 70
+	------------------------------------------------------------------------------------------------------------------------- */
+	@Test
+	void testGetSubjectAverage() throws Exception{
+		double expect[] = {90.3,87.7,89.1,89.5,89.7};
+		double actual[] = gradeSys.getSubjectAverage();
+		for(int i=0;i<expect.length;i++) {
+			assertEquals(true, Math.abs(expect[i]-actual[i])<0.05);
+		}
+	}
+	@Test
+	void testGetSubjectAverage2() throws Exception{
+		double expect[] = {90.0,87.4,88.8,89.2,89.4};
+		String newInput = "104062104 吳宗欣 70 70 70 70 70";
+		StudentsGrade newCase = new StudentsGrade(newInput.split(" "));
+		gradeSys.add(newCase);
+		double actual[] = gradeSys.getSubjectAverage();
+		for(int i=0;i<expect.length;i++) {
+			assertEquals(true, Math.abs(expect[i]-actual[i])<0.05);
+		}
+	}
+	
+	/** ----------------------------------------------------------------------------------------------------------------------
+	Unit test
+	testCaseSubjectAverage()
+	
+	case 1: 80
+	case 2: 81
+	------------------------------------------------------------------------------------------------------------------------- */
+	@Test
+	void testCaseSubjectAverage() throws Exception{
+		ByteArrayOutputStream stream = new ByteArrayOutputStream();
+		System.setOut(new PrintStream(stream));
+		GradeSys.caseSubjectAverage(gradeSys);
+		String expect = "lab1       : 90.3\n" + 
+				"lab2       : 87.7\n" + 
+				"lab3       : 89.1\n" + 
+				"mid-term   : 89.5\n" + 
+				"final exam : 89.7\n";
+		assertEquals(expect, stream.toString());
+	}
+	@Test
+	void testCaseSubjectAverage2() throws Exception{
+		String newInput = "104062104 吳宗欣 70 70 70 70 70";
+		StudentsGrade newCase = new StudentsGrade(newInput.split(" "));
+		gradeSys.add(newCase);
+		ByteArrayOutputStream stream = new ByteArrayOutputStream();
+		System.setOut(new PrintStream(stream));
+		GradeSys.caseSubjectAverage(gradeSys);
+		String expect = "lab1       : 90.0\n" + 
+				"lab2       : 87.4\n" + 
+				"lab3       : 88.8\n" + 
+				"mid-term   : 89.2\n" + 
+				"final exam : 89.4\n";
+		assertEquals(expect, stream.toString());
+	}
+	/** ----------------------------------------------------------------------------------------------------------------------
+	Unit test
 	testMenu()
 	
 	case 1: 962001051
@@ -323,21 +497,30 @@ class GSTest {
 				"2)R 顯示排名\n" + 
 				"3)A 顯示平均\n" + 
 				"4)W 更新配分\n" + 
-				"5)E 離開選單\n" + 
+				"5)D 成績分布\n" + 
+				"6)M 補考名單\n" + 
+				"7)S 各科平均\n" + 
+				"8)E 離開選單\n" + 
 				">> 李威廷排名第63/63\n" + 
 				"輸入指令 :\n" + 
 				"1)G 顯示成績\n" + 
 				"2)R 顯示排名\n" + 
 				"3)A 顯示平均\n" + 
 				"4)W 更新配分\n" + 
-				"5)E 離開選單\n" + 
+				"5)D 成績分布\n" + 
+				"6)M 補考名單\n" + 
+				"7)S 各科平均\n" + 
+				"8)E 離開選單\n" + 
 				">> 成績平均為: 89.46191\n" + 
 				"輸入指令 :\n" + 
 				"1)G 顯示成績\n" + 
 				"2)R 顯示排名\n" + 
 				"3)A 顯示平均\n" + 
 				"4)W 更新配分\n" + 
-				"5)E 離開選單\n" + 
+				"5)D 成績分布\n" + 
+				"6)M 補考名單\n" + 
+				"7)S 各科平均\n" + 
+				"8)E 離開選單\n" + 
 				">> ";
 		assertEquals(expect, stream.toString());
 	}
@@ -353,21 +536,30 @@ class GSTest {
 				"2)R 顯示排名\n" + 
 				"3)A 顯示平均\n" + 
 				"4)W 更新配分\n" + 
-				"5)E 離開選單\n" + 
+				"5)D 成績分布\n" + 
+				"6)M 補考名單\n" + 
+				"7)S 各科平均\n" + 
+				"8)E 離開選單\n" + 
 				">> 許文馨排名第15/63\n" + 
 				"輸入指令 :\n" + 
 				"1)G 顯示成績\n" + 
 				"2)R 顯示排名\n" + 
 				"3)A 顯示平均\n" + 
 				"4)W 更新配分\n" + 
-				"5)E 離開選單\n" + 
+				"5)D 成績分布\n" + 
+				"6)M 補考名單\n" + 
+				"7)S 各科平均\n" + 
+				"8)E 離開選單\n" + 
 				">> 成績平均為: 89.46191\n" + 
 				"輸入指令 :\n" + 
 				"1)G 顯示成績\n" + 
 				"2)R 顯示排名\n" + 
 				"3)A 顯示平均\n" + 
 				"4)W 更新配分\n" + 
-				"5)E 離開選單\n" + 
+				"5)D 成績分布\n" + 
+				"6)M 補考名單\n" + 
+				"7)S 各科平均\n" + 
+				"8)E 離開選單\n" + 
 				">> ";
 		assertEquals(expect, stream.toString());
 	}
@@ -383,18 +575,19 @@ class GSTest {
 		ByteArrayOutputStream stream = new ByteArrayOutputStream();
 		System.setOut(new PrintStream(stream));
 		Scanner scanner = new Scanner("0\n962001051\nE\nQ\n");
-		String expect = "輸入ID或Q(結束使用): " + 
-				"查無此ID!\n" + 
-				"輸入ID或Q(結束使用): " + 
-				"Welcome 李威廷\n" + 
+		String expect = "輸入ID或Q(結束使用): 查無此ID!\n" + 
+				"輸入ID或Q(結束使用): Welcome 李威廷\n" + 
 				"輸入指令 :\n" + 
 				"1)G 顯示成績\n" + 
 				"2)R 顯示排名\n" + 
 				"3)A 顯示平均\n" + 
 				"4)W 更新配分\n" + 
-				"5)E 離開選單\n" + 
-				">> 輸入ID或Q(結束使用): "+
-				"結束程式\n";
+				"5)D 成績分布\n" + 
+				"6)M 補考名單\n" + 
+				"7)S 各科平均\n" + 
+				"8)E 離開選單\n" + 
+				">> 輸入ID或Q(結束使用): 結束程式\n" + 
+				"";
 		GradeSys.login(scanner, gradeSys);
 		assertEquals(expect, stream.toString());
 	}
@@ -403,18 +596,19 @@ class GSTest {
 		ByteArrayOutputStream stream = new ByteArrayOutputStream();
 		System.setOut(new PrintStream(stream));
 		Scanner scanner = new Scanner("k\n955002056\nE\nQ\n");
-		String expect = "輸入ID或Q(結束使用): " + 
-				"輸入格式錯誤！\n" + 
-				"輸入ID或Q(結束使用): " + 
-				"Welcome 許文馨\n" + 
+		String expect = "輸入ID或Q(結束使用): 輸入格式錯誤！\n" + 
+				"輸入ID或Q(結束使用): Welcome 許文馨\n" + 
 				"輸入指令 :\n" + 
 				"1)G 顯示成績\n" + 
 				"2)R 顯示排名\n" + 
 				"3)A 顯示平均\n" + 
 				"4)W 更新配分\n" + 
-				"5)E 離開選單\n" + 
-				">> 輸入ID或Q(結束使用): "+
-				"結束程式\n";
+				"5)D 成績分布\n" + 
+				"6)M 補考名單\n" + 
+				"7)S 各科平均\n" + 
+				"8)E 離開選單\n" + 
+				">> 輸入ID或Q(結束使用): 結束程式\n" + 
+				"";
 		GradeSys.login(scanner, gradeSys);
 		assertEquals(expect, stream.toString());
 	}
@@ -452,7 +646,10 @@ class GSTest {
 				"2)R 顯示排名\n" + 
 				"3)A 顯示平均\n" + 
 				"4)W 更新配分\n" + 
-				"5)E 離開選單\n" + 
+				"5)D 成績分布\n" + 
+				"6)M 補考名單\n" + 
+				"7)S 各科平均\n" + 
+				"8)E 離開選單\n" + 
 				">> lab1:          100\n" + 
 				"lab2:          100\n" + 
 				"lab3:          100\n" + 
@@ -464,21 +661,30 @@ class GSTest {
 				"2)R 顯示排名\n" + 
 				"3)A 顯示平均\n" + 
 				"4)W 更新配分\n" + 
-				"5)E 離開選單\n" + 
+				"5)D 成績分布\n" + 
+				"6)M 補考名單\n" + 
+				"7)S 各科平均\n" + 
+				"8)E 離開選單\n" + 
 				">> 吳宗欣排名第1/64\n" + 
 				"輸入指令 :\n" + 
 				"1)G 顯示成績\n" + 
 				"2)R 顯示排名\n" + 
 				"3)A 顯示平均\n" + 
 				"4)W 更新配分\n" + 
-				"5)E 離開選單\n" + 
+				"5)D 成績分布\n" + 
+				"6)M 補考名單\n" + 
+				"7)S 各科平均\n" + 
+				"8)E 離開選單\n" + 
 				">> 成績平均為: 89.626564\n" + 
 				"輸入指令 :\n" + 
 				"1)G 顯示成績\n" + 
 				"2)R 顯示排名\n" + 
 				"3)A 顯示平均\n" + 
 				"4)W 更新配分\n" + 
-				"5)E 離開選單\n" + 
+				"5)D 成績分布\n" + 
+				"6)M 補考名單\n" + 
+				"7)S 各科平均\n" + 
+				"8)E 離開選單\n" + 
 				">> 舊配分\n" + 
 				"lab1:           10%\n" + 
 				"lab2:           10%\n" + 
@@ -498,7 +704,10 @@ class GSTest {
 				"2)R 顯示排名\n" + 
 				"3)A 顯示平均\n" + 
 				"4)W 更新配分\n" + 
-				"5)E 離開選單\n" + 
+				"5)D 成績分布\n" + 
+				"6)M 補考名單\n" + 
+				"7)S 各科平均\n" + 
+				"8)E 離開選單\n" + 
 				">> lab1:          100\n" + 
 				"lab2:          100\n" + 
 				"lab3:          100\n" + 
@@ -510,23 +719,31 @@ class GSTest {
 				"2)R 顯示排名\n" + 
 				"3)A 顯示平均\n" + 
 				"4)W 更新配分\n" + 
-				"5)E 離開選單\n" + 
+				"5)D 成績分布\n" + 
+				"6)M 補考名單\n" + 
+				"7)S 各科平均\n" + 
+				"8)E 離開選單\n" + 
 				">> 吳宗欣排名第1/64\n" + 
 				"輸入指令 :\n" + 
 				"1)G 顯示成績\n" + 
 				"2)R 顯示排名\n" + 
 				"3)A 顯示平均\n" + 
 				"4)W 更新配分\n" + 
-				"5)E 離開選單\n" + 
+				"5)D 成績分布\n" + 
+				"6)M 補考名單\n" + 
+				"7)S 各科平均\n" + 
+				"8)E 離開選單\n" + 
 				">> 成績平均為: 89.56405\n" + 
 				"輸入指令 :\n" + 
 				"1)G 顯示成績\n" + 
 				"2)R 顯示排名\n" + 
 				"3)A 顯示平均\n" + 
 				"4)W 更新配分\n" + 
-				"5)E 離開選單\n" + 
-				">> 輸入ID或Q(結束使用): 結束程式\n" + 
-				"";
+				"5)D 成績分布\n" + 
+				"6)M 補考名單\n" + 
+				"7)S 各科平均\n" + 
+				"8)E 離開選單\n" + 
+				">> 輸入ID或Q(結束使用): 結束程式\n";
 		GradeSys.login(scanner, gradeSys);
 		assertEquals(expect, stream.toString());
 	}
